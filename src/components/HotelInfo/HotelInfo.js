@@ -10,12 +10,16 @@ import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import Hotel from '@material-ui/icons/Hotel';
+import LocalActivity from '@material-ui/icons/LocalActivity';
+import Save from '@material-ui/icons/Save';
+import RateReview from '@material-ui/icons/RateReview';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import queryString from 'query-string';
 
 import ReviewCard from '../ReviewCard';
+import ReviewModal from '../ReviewModal';
 
 function Copyright() {
   return (
@@ -53,6 +57,10 @@ const styles = theme => ({
     margin: theme.spacing(1),
     backgroundColor: theme.palette.secondary.main,
   },
+  avatarTwo: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main
+  },
   form: {
     width: '100%',
     marginTop: theme.spacing(1),
@@ -66,6 +74,11 @@ const styles = theme => ({
     overflow: 'scroll',
     flexDirection: 'column',
     padding: '10px',
+  },
+  iconsWrapper: {
+    display: 'flex',
+    marginTop: 20,
+    cursor: 'pointer',
   }
 });
 
@@ -79,6 +92,7 @@ class HotelInfo extends Component {
       hotelId: 0,
       hotelInfo: {},
       reviewsArr: [],
+      open: false
     }
   }
 
@@ -108,62 +122,36 @@ class HotelInfo extends Component {
     .catch(err => console.log("error while fetching hotel info: ", err));
   }
 
-  handleUsername = e => {
-    e.preventDefault();
-    this.setState({ username: e.target.value });
-  }
-
-  handlePassword = e => {
-    e.preventDefault();
-    this.setState({ password: e.target.value });
-  }
-
-  handleSubmit = e => {
-    e.preventDefault();
-    console.log("username: ", this.state.username);
-    console.log("password: ", this.state.password);    
-    this.loginUser();
-  }
-
-  loginUser = () => {
-    var headers = {
-      "Content-Type": "application/x-www-form-urlencoded"
-    }
-    var query = queryString.stringify({
-      username: this.state.username,
-      password: this.state.password
-    })
-
-    fetch('http://localhost:8090/login', {
-     method: 'POST',
-     headers: headers,
-     body: query
-    })
-    .then(res => {
-      console.log("the response is: ", res)
-      if(res.ok) return res.json();
-    })
-    .then(json => {
-      let { message, success } = json;
-      console.log("message: ", message)
-      if(success) {
-        this.props.cookies.set('nishTrip', this.state.username)
-        this.props.history.push('/home')
-      }
-      else if(message === "error") this.setState({ error: true })
-    })
-    .catch(err => {
-      console.log("error while signing user up ", err)
-    })
-  }
-
   isObjEmpty = obj => {
     return Object.entries(obj).length === 0 && obj.constructor === Object
   }
 
+  handleAttractions = () => {
+    console.log("clicked attractions")
+  }
+
+  handleReview = () => {
+    this.setState({ open: true })
+  }
+
+  handleClose = () => {
+    this.setState({ open: false })
+  }
+
+  handleSaveHotel = () => {
+
+  }
+
+  addReview = review => {
+    console.log("in add review: ", review)
+    this.setState(prevState => ({
+        reviewsArr: [review, ...prevState.reviewsArr]
+    }))
+  }
+
   render() {
     const { classes, hotel } = this.props;
-    let { error, hotelInfo, reviewsArr } = this.state;
+    let { error, hotelInfo, reviewsArr, open, hotelId } = this.state;
     let name = "Hotel Info";
     let addr = "";
     if(!this.isObjEmpty(hotelInfo)) {
@@ -185,11 +173,23 @@ class HotelInfo extends Component {
             <Typography component="h3" variant="h5">
               {addr}
             </Typography>
+              <div className={classes.iconsWrapper}>
+                <Avatar onClick={this.handleAttractions} className={classes.avatarTwo}>
+                  <LocalActivity />
+                </Avatar>
+                <Avatar onClick={this.handleReview} className={classes.avatarTwo}>
+                  <RateReview />
+                </Avatar>
+                <Avatar onClick={this.handleSaveHotel} className={classes.avatarTwo}>
+                  <Save />
+                </Avatar>
+              </div>
               <div className={classes.reviewsWrapper}>
                 {reviewsArr.map(review => (
-                  <ReviewCard review={review} />
+                  <ReviewCard key={review.reviewId} review={review} />
                 ))}
               </div>
+              <ReviewModal hotelId={hotelId} open={open} handleClose={this.handleClose} addReview={this.addReview} />
               <Box mt={5}>
                 <Copyright />
               </Box>

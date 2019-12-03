@@ -53,12 +53,13 @@ const getImage = () => ("https://source.unsplash.com/1600x900/?hotel");
 export default function ReviewCard(props) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
+  console.log("props: ", props)
   const { review } = props;
-  const { reviewId, title, date, user, reviewText } = review;
+  const { reviewId, title, reviewSubmissionTime, userNickname, reviewText, ratingOverall } = review;
 
   let letter = 'U'
-  if(user !== null) {
-    letter = user.substring(0,1).toUpperCase();
+  if(userNickname !== null) {
+    letter = userNickname.substring(0,1).toUpperCase();
   }
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -78,7 +79,7 @@ export default function ReviewCard(props) {
           </IconButton>
         }
         title={title}
-        subheader={`${user} ${date}`}
+        subheader={userNickname}
       />
       <CardActions disableSpacing>
         <IconButton aria-label="add to favorites">
