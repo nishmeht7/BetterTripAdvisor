@@ -15,7 +15,6 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { Redirect } from 'react-router-dom'
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -54,7 +53,7 @@ export default function HotelCard(props) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   const { result } = props;
-  const { addr, city, hotelId, lat, lng, name, state } = result;
+  const { city, hotelId, name, state } = result;
 
   const handleExpandClick = () => {
     setExpanded(!expanded);

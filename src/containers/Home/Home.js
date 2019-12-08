@@ -1,20 +1,5 @@
 import React, { Component } from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
 
 import SearchModal from '../../components/SearchModal';
 import HotelCard from '../../components/HotelCard';
@@ -69,8 +54,9 @@ class Home extends Component {
 	}
 
 	render() {
-		let { cookies, classes } = this.props;
+		let { classes } = this.props;
 		let { resultsArr } = this.state;
+
 		return (
 			<div className={classes.root}> 
         		<div className={classes.paper}>

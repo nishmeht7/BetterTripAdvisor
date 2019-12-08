@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
 import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
@@ -15,7 +10,6 @@ import Save from '@material-ui/icons/Save';
 import RateReview from '@material-ui/icons/RateReview';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
 import queryString from 'query-string';
 
 import ReviewCard from '../ReviewCard';
@@ -92,7 +86,8 @@ class HotelInfo extends Component {
       hotelId: 0,
       hotelInfo: {},
       reviewsArr: [],
-      open: false
+      open: false,
+      reviewId: ''
     }
   }
 
@@ -149,9 +144,60 @@ class HotelInfo extends Component {
     }))
   }
 
+  updateReview = review => {
+    let reviewsArr = this.state.reviewsArr;
+    reviewsArr.forEach((elem, idx) => {
+      if(elem.reviewId === review.reviewId) {
+        let reviewObj = reviewsArr[idx];
+        reviewObj.title = review.title;
+        reviewObj.reviewText = review.reviewText;
+        reviewsArr[idx] = reviewObj;
+        console.log(reviewsArr[idx])
+      }
+    })
+    this.setState(prevState => ({
+      reviewArr: reviewsArr
+    }))
+  }
+
+  handleEditReview = reviewId => {
+    this.setState({ open: true, reviewId: reviewId })
+  }
+
+  handleRemoveReview = reviewId => {
+    let reviewsArr = this.state.reviewsArr;
+    var headers = {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+    var query = queryString.stringify({
+      reviewId: reviewId,
+      delete: true
+    })
+
+    fetch('http://localhost:8090/reviews', {
+     method: 'POST',
+     headers: headers,
+     body: query
+    })
+    .then(res => {
+      if(res.ok) return res.json();
+    })
+    .then (json => {
+      const { success } = json;
+      if(success) {
+        let updatedArr = this.state.reviewsArr.filter(elem => elem.reviewId !== reviewId)
+        this.setState({ reviewsArr: updatedArr })
+      }
+    })
+    .catch(err => {
+      console.log("error while deleting review: ", err)
+    })
+  }
+
   render() {
-    const { classes, hotel } = this.props;
-    let { error, hotelInfo, reviewsArr, open, hotelId } = this.state;
+    const { classes, hotel, cookies } = this.props;
+    let { error, hotelInfo, reviewsArr, open, hotelId, reviewId } = this.state;
+    let user = cookies.get('user');
     let name = "Hotel Info";
     let addr = "";
     if(!this.isObjEmpty(hotelInfo)) {
@@ -186,10 +232,24 @@ class HotelInfo extends Component {
               </div>
               <div className={classes.reviewsWrapper}>
                 {reviewsArr.map(review => (
-                  <ReviewCard key={review.reviewId} review={review} />
+                  <ReviewCard 
+                    key={review.reviewId}
+                    review={review}
+                    user={user}
+                    handleEditReview={this.handleEditReview}
+                    handleRemoveReview={this.handleRemoveReview}
+                  />
                 ))}
               </div>
-              <ReviewModal hotelId={hotelId} open={open} handleClose={this.handleClose} addReview={this.addReview} />
+              <ReviewModal 
+                user={user}
+                hotelId={hotelId} 
+                open={open} 
+                handleClose={this.handleClose} 
+                addReview={this.addReview}
+                reviewId={reviewId}
+                updateReview={this.updateReview}
+              />
               <Box mt={5}>
                 <Copyright />
               </Box>

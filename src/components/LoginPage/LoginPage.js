@@ -105,7 +105,11 @@ class LoginPage extends Component {
       let { message, success } = json;
       console.log("message: ", message)
       if(success) {
-        this.props.cookies.set('nishTrip', this.state.username)
+        let userObj = {
+          username: this.state.username,
+          userId: message
+        }
+        this.props.cookies.set('user', userObj)
         this.props.history.push('/home')
       }
       else if(message === "error") this.setState({ error: true })

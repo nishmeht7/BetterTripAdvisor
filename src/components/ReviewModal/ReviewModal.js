@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -42,6 +42,8 @@ class ReviewModal extends React.Component {
       title: this.state.title,
       text: this.state.text,
       hotelId: this.props.hotelId,
+      userId: this.props.user.userId,
+      reviewId: this.props.reviewId
     })
 
     fetch('http://localhost:8090/reviews', {
@@ -54,19 +56,24 @@ class ReviewModal extends React.Component {
     })
     .then(json => {
       let { message, success } = json;
-      console.log("message: ", message)
       if(success) {
         let reviewObj = {
           userNickname: this.state.name,
           title: this.state.title,
           reviewText: this.state.text,
           hotelId: this.props.hotelId,
-          reviewId: message
+          userId: this.props.user.userId
         }
-        // reviewId, title, date, user, reviewText
-        console.log("review obj: ", reviewObj)
-        this.props.addReview(reviewObj)
-        this.props.handleClose()
+        if(this.props.reviewId) {
+          reviewObj.reviewId = this.props.reviewId;
+          this.props.updateReview(reviewObj)
+          this.props.handleClose()
+        }
+        else {
+          reviewObj.reviewId = message;
+          this.props.addReview(reviewObj)
+          this.props.handleClose()
+        }
       }
       else if(message === "error") this.setState({ error: true })
     })

@@ -3,20 +3,15 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import InputLabel from '@material-ui/core/InputLabel';
 import queryString from 'query-string';
-
-import { Redirect } from 'react-router-dom'
-
 
 function Copyright() {
   return (
@@ -74,7 +69,7 @@ class SignUpPage extends Component {
     e.preventDefault();
     let isTrue = false;
     const { username, password } = this.state;
-    let regex = new RegExp("^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])");
+    let regex = new RegExp("^(?=. [a-z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])");
     if(username !== "") {
       console.log("username is", username);
       console.log("the password is, ", password);
@@ -119,8 +114,12 @@ class SignUpPage extends Component {
     .then(json => {
       let { message, success } = json;
       console.log("message: ", message)
+      let userObj = {
+          username: this.state.username,
+          userId: message
+        }
       if(success) {
-        this.props.cookies.set('nishTrip', this.state.username)
+        this.props.cookies.set('user', userObj)
         this.props.history.push('/home')
       }
       else if(message === "username") this.setState({ userExists: true })
