@@ -41,13 +41,18 @@ const useStyles = makeStyles(theme => ({
   avatar: {
     backgroundColor: red[500],
   },
+  likes: {
+    fontSize: 12,
+    color: 'gray',
+  }
 }));
 
 export default function ReviewCard(props) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
-  const { review, user, handleEditReview, handleRemoveReview } = props;
-  const { reviewId, title, reviewSubmissionTime, userNickname, reviewText, ratingOverall, userId } = review;
+  const { review, user, handleLikeReview, handleEditReview, handleRemoveReview } = props;
+  const { reviewId, title, reviewSubmissionTime, userNickname, reviewText, ratingOverall, userId, likes } = review;
+
   let letter = 'U'
   if(userNickname !== null) {
     letter = userNickname.substring(0,1).toUpperCase();
@@ -55,6 +60,8 @@ export default function ReviewCard(props) {
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
+  let noun = likes == 1 ? 'person' : 'people';
 
   return (
     <Card className={classes.card}>
@@ -79,11 +86,13 @@ export default function ReviewCard(props) {
         subheader={userNickname}
       />
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
+        <IconButton onClick={() => handleLikeReview(reviewId)} aria-label="add to favorites">
           <FavoriteIcon />
         </IconButton>
         <CardContent>
           <Typography paragraph> {reviewText}
+          <br />
+          <span className={classes.likes}>{`${likes} ${noun} found this review helpful`}</span>
           </Typography>
         </CardContent>
       </CardActions>

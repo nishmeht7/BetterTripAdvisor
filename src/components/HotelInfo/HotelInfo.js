@@ -97,6 +97,7 @@ class HotelInfo extends Component {
       open: false,
       reviewId: '',
       viewReviews: true,
+      likedObj: {}
     }
   }
 
@@ -262,6 +263,47 @@ class HotelInfo extends Component {
     }
   }
 
+  handleLikeReview = reviewId => {
+    let { cookies } = this.props;
+    let user = cookies.get('user');
+    var headers = {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+    let userId = user.userId;
+    var query = queryString.stringify({
+      userId: userId,
+      reviewId: reviewId,
+      like: true
+    })
+    fetch(`http://localhost:8090/reviews`, {
+      method: 'POST',
+      headers: headers,
+      body: query
+    })
+    .then(res => {
+      if(res.ok) return res.json()
+    })
+    .then(json => {
+      const { success } = json; 
+      if(success) {
+        let { likedObj } = this.state;
+        let updatedArr = this.state.reviewsArr.map(review => {
+          if(review.reviewId === reviewId && !likedObj.hasOwnProperty(reviewId)) {
+            review.likes = review.likes + 1;
+            let newObj = likedObj;
+            newObj[reviewId] = 1;
+            this.setState({ likedObj: newObj })
+          }
+          return review;
+        });
+        this.setState({ reviewsArr: updatedArr })
+      }
+    })
+    .catch(err => {
+      console.log("error while saving hotel: ", err)
+    }) 
+  }
+
   render() {
     const { classes, hotel, cookies } = this.props;
     let { error, hotelInfo, reviewsArr, open, hotelId, reviewId, viewReviews, attractionsArr } = this.state;
@@ -306,6 +348,7 @@ class HotelInfo extends Component {
                     user={user}
                     handleEditReview={this.handleEditReview}
                     handleRemoveReview={this.handleRemoveReview}
+                    handleLikeReview={this.handleLikeReview}
                   />
                 ))}
               </div>
