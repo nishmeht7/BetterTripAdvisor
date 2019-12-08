@@ -13,15 +13,10 @@ class ReviewModal extends React.Component {
   constructor() {
     super();
     this.state = {
-      name: '',
       title: '',
       text: '',
       error: false
     }
-  }
-
-  handleName = e => {
-    this.setState({ name: e.target.value })
   }
 
   handleTitle = e => {
@@ -38,7 +33,7 @@ class ReviewModal extends React.Component {
       "Content-Type": "application/x-www-form-urlencoded"
     }
     var query = queryString.stringify({
-      name: this.state.name,
+      name: this.props.user.username,
       title: this.state.title,
       text: this.state.text,
       hotelId: this.props.hotelId,
@@ -58,7 +53,7 @@ class ReviewModal extends React.Component {
       let { message, success } = json;
       if(success) {
         let reviewObj = {
-          userNickname: this.state.name,
+          userNickname: this.props.user.username,
           title: this.state.title,
           reviewText: this.state.text,
           hotelId: this.props.hotelId,
@@ -94,15 +89,6 @@ class ReviewModal extends React.Component {
               Your honest reviews help others book their ideal experience. Thank you :) 
             </DialogContentText>
             <form onSubmit={this.handleSubmit} noValidate>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="name"
-                label="Name"
-                type="name"
-                fullWidth
-                onChange={this.handleName}
-              />
               <TextField
                 autoFocus
                 margin="dense"

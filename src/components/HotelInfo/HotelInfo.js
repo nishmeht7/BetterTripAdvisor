@@ -11,9 +11,13 @@ import RateReview from '@material-ui/icons/RateReview';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import queryString from 'query-string';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 
 import ReviewCard from '../ReviewCard';
 import ReviewModal from '../ReviewModal';
+import AttractionsCard from './AttractionsCard';
+import Slider from './Slider';
 
 function Copyright() {
   return (
@@ -39,7 +43,7 @@ const styles = theme => ({
     backgroundColor: '#F2F2F2'
   },
   paper: {
-    height: '80vh',
+    height: '90vh',
     margin: theme.spacing(8, 4),
     display: 'flex',
     flexDirection: 'column',
@@ -73,6 +77,9 @@ const styles = theme => ({
     display: 'flex',
     marginTop: 20,
     cursor: 'pointer',
+  },
+  slider: {
+    marginTop: 20
   }
 });
 
@@ -86,8 +93,10 @@ class HotelInfo extends Component {
       hotelId: 0,
       hotelInfo: {},
       reviewsArr: [],
+      attractionsArr: [],
       open: false,
-      reviewId: ''
+      reviewId: '',
+      viewReviews: true,
     }
   }
 
@@ -122,7 +131,31 @@ class HotelInfo extends Component {
   }
 
   handleAttractions = () => {
-    console.log("clicked attractions")
+    let radius = 2;
+    const { hotelId } = this.state;
+    let reviewsArr = this.state.reviewsArr;
+    var headers = {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+    var query = queryString.stringify({
+      hotelId: hotelId,
+      radius: radius
+    })
+    fetch(`http://localhost:8090/attractions?hotelId=${hotelId}&radius=${radius}`, {
+      method: 'GET',
+      headers: headers,
+    })
+    .then(res => { if(res.ok) return res.json() })
+    .then(json => {
+      const { results } = json;
+      this.setState({ attractionsArr: results }, () => {
+        this.setState({ viewReviews: false })
+      })
+
+    })
+    .catch(err => {
+      console.log("error while fetching attractions: ", err)
+    })
   }
 
   handleReview = () => {
@@ -138,7 +171,6 @@ class HotelInfo extends Component {
   }
 
   addReview = review => {
-    console.log("in add review: ", review)
     this.setState(prevState => ({
         reviewsArr: [review, ...prevState.reviewsArr]
     }))
@@ -194,9 +226,21 @@ class HotelInfo extends Component {
     })
   }
 
+  updateView = num => {
+    let viewReviews = this.state.viewReviews;
+    let attractionsArr = this.state.attractionsArr;
+    if(num === 1 && viewReviews) {
+      if(attractionsArr.length < 1) this.handleAttractions()
+      else this.setState({ viewReviews: false })
+    }
+    else if(num === 0 && !viewReviews) {
+      this.setState({ viewReviews: true })
+    }
+  }
+
   render() {
     const { classes, hotel, cookies } = this.props;
-    let { error, hotelInfo, reviewsArr, open, hotelId, reviewId } = this.state;
+    let { error, hotelInfo, reviewsArr, open, hotelId, reviewId, viewReviews, attractionsArr } = this.state;
     let user = cookies.get('user');
     let name = "Hotel Info";
     let addr = "";
@@ -220,9 +264,6 @@ class HotelInfo extends Component {
               {addr}
             </Typography>
               <div className={classes.iconsWrapper}>
-                <Avatar onClick={this.handleAttractions} className={classes.avatarTwo}>
-                  <LocalActivity />
-                </Avatar>
                 <Avatar onClick={this.handleReview} className={classes.avatarTwo}>
                   <RateReview />
                 </Avatar>
@@ -231,7 +272,10 @@ class HotelInfo extends Component {
                 </Avatar>
               </div>
               <div className={classes.reviewsWrapper}>
-                {reviewsArr.map(review => (
+                {!viewReviews && attractionsArr.map(attr => (
+                  <AttractionsCard key={attr.place_id} title={attr.name} subHeader={attr.formatted_address} text={"text"} />
+                ))}
+                {viewReviews && reviewsArr.map(review => (
                   <ReviewCard 
                     key={review.reviewId}
                     review={review}
@@ -250,6 +294,9 @@ class HotelInfo extends Component {
                 reviewId={reviewId}
                 updateReview={this.updateReview}
               />
+              <div className={classes.slider}>
+                <Slider updateView={this.updateView} />
+              </div>
               <Box mt={5}>
                 <Copyright />
               </Box>
