@@ -167,7 +167,31 @@ class HotelInfo extends Component {
   }
 
   handleSaveHotel = () => {
-
+    let { cookies } = this.props;
+    let user = cookies.get('user');
+    var headers = {
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+    console.log("userID: ", user.userId)
+    console.log("hotelId: ", this.state.hotelId)
+    var query = queryString.stringify({
+      userId: user.userId,
+      hotelId: this.state.hotelId
+    })
+    fetch('http://localhost:8090/hotelInfo', {
+      method: 'POST',
+      headers: headers,
+      body: query
+    })
+    .then(res => {
+      if(res.ok) return res.json()
+    })
+    .then(json => {
+      console.log("saved hotel json: ", json)
+    })
+    .catch(err => {
+      console.log("error while saving hotel: ", err)
+    })
   }
 
   addReview = review => {

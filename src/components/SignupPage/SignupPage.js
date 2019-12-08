@@ -69,7 +69,7 @@ class SignUpPage extends Component {
     e.preventDefault();
     let isTrue = false;
     const { username, password } = this.state;
-    let regex = new RegExp("^(?=. [a-z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])");
+    let regex = new RegExp("^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])");
     if(username !== "") {
       console.log("username is", username);
       console.log("the password is, ", password);

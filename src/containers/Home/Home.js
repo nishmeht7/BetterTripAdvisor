@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import SearchModal from '../../components/SearchModal';
 import HotelCard from '../../components/HotelCard';
+import NavBar from '../../components/NavBar';
 
 const styles = theme => ({
   root: {
@@ -54,10 +55,11 @@ class Home extends Component {
 	}
 
 	render() {
-		let { classes } = this.props;
+		let { classes, cookies, history } = this.props;
 		let { resultsArr } = this.state;
-
+		console.log("home props: ", this.props)
 		return (
+			<div>
 			<div className={classes.root}> 
         		<div className={classes.paper}>
         			<SearchModal setResults={this.setResults} />
@@ -67,6 +69,7 @@ class Home extends Component {
 	        			))}
         			</div>
         		</div>
+			</div>
 			</div>
 		)
 	}
