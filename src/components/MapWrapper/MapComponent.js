@@ -9,6 +9,7 @@ const mapStyles = {
 class MapComponent extends React.Component {
 	render() {
 		const { results, center } = this.props;
+		console.log("results in map: ", results)
 		return (
 				<Map
 					google={this.props.google}
@@ -30,6 +31,6 @@ class MapComponent extends React.Component {
 	}
 
 export default GoogleApiWrapper({
-  apiKey: ''
+  apiKey: 'AIzaSyA1gARNA3R0iESgM_9demFfW6nUGu2sDVQ'
 })(MapComponent);
 

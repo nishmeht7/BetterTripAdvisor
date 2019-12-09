@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Avatar from '@material-ui/core/Avatar';
+import MapIcon from '@material-ui/icons/Map';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
@@ -99,7 +100,9 @@ class HotelInfo extends Component {
       open: false,
       reviewId: '',
       viewReviews: true,
-      likedObj: {}
+      likedObj: {},
+      mapOpen: false,
+      coords: {}
     }
   }
 
@@ -107,7 +110,6 @@ class HotelInfo extends Component {
     console.log("props: ", this.props);
     const params = queryString.parse(this.props.location.search);
     let hotelId = params.hotelId;
-    // if(hotelId === null || isNaN(hotelId)) this.props.history.push('/home');
     this.setState({ hotelId: hotelId }, () => {
       this.fetchHotelInfo();
     });
@@ -118,9 +120,11 @@ class HotelInfo extends Component {
 
     fetchRequest(url, "GET", null)
     .then(json => {
-      const { name, addr, reviewsArr } = json;
-      let hotelObj = {name, addr};
-      this.setState({ hotelInfo: hotelObj, reviewsArr: reviewsArr }, () => {
+      let hotelId = this.state.hotelId
+      const { name, addr, reviewsArr, lat, lng } = json;
+      let hotelObj = {name, addr, lat, lng, hotelId};
+      let coords = {lat, lng}
+      this.setState({ hotelInfo: hotelObj, reviewsArr: reviewsArr, coords: coords }, () => {
         console.log("the state is: ", this.state);
       });
     })
@@ -283,6 +287,14 @@ class HotelInfo extends Component {
     }) 
   }
 
+  handleOpenMap = () => {
+    this.setState({ mapOpen: true })
+  }
+
+  handleCloseMap = () => {
+    this.setState({ mapOpen: false })
+  }
+
   render() {
     const { classes, hotel, cookies } = this.props;
     let { error, hotelInfo, reviewsArr, open, hotelId, reviewId, viewReviews, attractionsArr } = this.state;
@@ -293,6 +305,7 @@ class HotelInfo extends Component {
       name = hotelInfo.name === null ? "Hotel Info" : hotelInfo.name;
       addr = hotelInfo.addr === null ? "" : hotelInfo.addr;
     }
+    let hotelArr = [hotelInfo]
     return (
       <Grid container component="main" className={classes.root}>
         <CssBaseline />
@@ -315,7 +328,11 @@ class HotelInfo extends Component {
                 <Avatar onClick={this.handleSaveHotel} className={classes.avatarTwo}>
                   <Save />
                 </Avatar>
+                <Avatar onClick={this.handleOpenMap} className={classes.avatarTwo}>
+                  <MapIcon />
+                </Avatar>
               </div>
+              <MapWrapper open={this.state.mapOpen} handleClose={this.handleCloseMap} results={hotelArr} />
               <div className={classes.reviewsWrapper}>
                 {!viewReviews && attractionsArr.map(attr => (
                   <AttractionsCard key={attr.place_id} title={attr.name} subHeader={attr.formatted_address} text={"text"} />
