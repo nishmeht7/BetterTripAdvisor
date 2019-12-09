@@ -19,6 +19,7 @@ import ReviewModal from '../ReviewModal';
 import AttractionsCard from './AttractionsCard';
 import Slider from './Slider';
 import fetchRequest from '../util';
+import MapWrapper from '../MapWrapper'
 
 function Copyright() {
   return (

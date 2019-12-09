@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
+import Avatar from '@material-ui/core/Avatar';
+import MapIcon from '@material-ui/icons/Map';
 import { withStyles } from '@material-ui/core/styles';
 
 import SearchModal from '../../components/SearchModal';
 import HotelCard from '../../components/HotelCard';
 import NavBar from '../../components/NavBar';
+import MapWrapper from '../../components/MapWrapper';
+import fetchRequest from '../../components/util';
 
 const styles = theme => ({
   root: {
@@ -39,15 +43,37 @@ const styles = theme => ({
     maxWidth: '80%',
     flexWrap: 'wrap',
     padding: '10px',
-  }
+  },
+  avatarTwo: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main
+  },
 });
 
 class Home extends Component {
 	constructor() {
 		super()
 		this.state = {
-			resultsArr: []
+			resultsArr: [],
+			hotelsArr: [],
+			open: false
 		}
+	}
+
+	handleOpen = () => {
+		let url = `http://localhost:8090/hotelInfo?map=${true}`
+
+		fetchRequest(url, "GET", null)
+		.then(json => {
+			this.setState({ hotelsArr: json, open: true })
+		})
+		.catch(err => {
+			console.log("error while fetching all hotels: ", err)
+		})
+	}
+
+	handleClose = () => {
+		this.setState({ open: false })
 	}
 
 	setResults = arr => {
@@ -56,12 +82,15 @@ class Home extends Component {
 
 	render() {
 		let { classes, cookies, history } = this.props;
-		let { resultsArr } = this.state;
-		console.log("home props: ", this.props)
+		let { resultsArr, hotelsArr } = this.state;
 		return (
 			<div>
 			<div className={classes.root}> 
         		<div className={classes.paper}>
+        			<Avatar onClick={this.handleOpen} className={classes.avatarTwo}>
+	                  <MapIcon />
+	                </Avatar>
+        			<MapWrapper open={this.state.open} handleClose={this.handleClose} results={hotelsArr} />
         			<SearchModal setResults={this.setResults} />
         			<div className={classes.results}>
 	        			{resultsArr.map(result => (
