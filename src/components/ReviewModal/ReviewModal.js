@@ -9,6 +9,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import InputLabel from '@material-ui/core/InputLabel';
 import queryString from 'query-string';
 
+import fetchRequest from '../util';
+
 class ReviewModal extends React.Component {
   constructor() {
     super();
@@ -41,14 +43,8 @@ class ReviewModal extends React.Component {
       reviewId: this.props.reviewId
     })
 
-    fetch('http://localhost:8090/reviews', {
-     method: 'POST',
-     headers: headers,
-     body: query
-    })
-    .then(res => {
-      if(res.ok) return res.json();
-    })
+    let url = "http://localhost:8090/reviews"
+    fetchRequest(url, "POST", query)
     .then(json => {
       let { message, success } = json;
       if(success) {
@@ -57,7 +53,8 @@ class ReviewModal extends React.Component {
           title: this.state.title,
           reviewText: this.state.text,
           hotelId: this.props.hotelId,
-          userId: this.props.user.userId
+          userId: this.props.user.userId,
+          likes: 0
         }
         if(this.props.reviewId) {
           reviewObj.reviewId = this.props.reviewId;

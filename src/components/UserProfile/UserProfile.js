@@ -18,6 +18,7 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 import HotelCard from '../HotelCard';
 import ReviewModal from '../ReviewModal';
+import fetchRequest from '../util';
 
 function Copyright() {
   return (
@@ -100,14 +101,11 @@ class HotelInfo extends Component {
       "Content-Type": "application/x-www-form-urlencoded"
     }
     let userId = user.userId;
-    fetch(`http://localhost:8090/hotelInfo?userId=${userId}`, {
-      method: 'GET',
-      headers: headers,
-    })
-    .then(res => {
-      if(res.ok) return res.json()
-    })
+
+    let url = `http://localhost:8090/hotelInfo?userId=${userId}`;
+    fetchRequest(url, "GET", null)
     .then(arr => {
+      console.log("the arr is: ", arr);
       if(arr && arr.length > 0) {
         this.setState({ savedHotels: arr });
       }
@@ -132,14 +130,9 @@ class HotelInfo extends Component {
       userId: userId,
       delete: true
     })
-    fetch(`http://localhost:8090/hotelInfo`, {
-      method: 'POST',
-      headers: headers,
-      body: query
-    })
-    .then(res => {
-      if(res.ok) return res.json()
-    })
+    let url = `http://localhost:8090/hotelInfo`
+
+    fetchRequest(url, "POST", query)
     .then(json => {
       const { success } = json; 
       if(success) {
@@ -151,11 +144,24 @@ class HotelInfo extends Component {
     })  
   }
 
+  formatTime = () => {
+    let lastLogin = "Today";
+    let timestamp = this.props.cookies.get("lastLogin");
+    if(timestamp != null) {
+      let timeArr = timestamp.split('.');
+      let date = timeArr.slice(0,3).join('-');
+      let time = timeArr.slice(3).join(':');
+      lastLogin = `${date} ${time}`;
+    }
+    return lastLogin;
+  }
+
   render() {
     const { classes, hotel, cookies } = this.props;
     let { error, savedHotels, open, viewReviews } = this.state;
     let user = cookies.get('user');
     let title = `${user.username}'s saved hotels`;
+
     return (
       <Grid container component="main" className={classes.root}>
         <CssBaseline />
@@ -177,6 +183,9 @@ class HotelInfo extends Component {
                   <HotelCard  key={result.hotelId} {...this.props} result={result} />
                 ))}
               </div>
+              <Typography component="h4" variant="subtitle2">
+                Last Login: {this.formatTime()}
+              </Typography>
               <Box mt={5}>
                 <Copyright />
               </Box>
