@@ -15,18 +15,29 @@ const cookies = new Cookies()
 
 class Root extends Component {
   render() {
-    const isRegistered = cookies.get('nishTrip')
-    const path = isRegistered ? '/home' : '/login'
+    const isRegistered = cookies.get('user')
+    const path = isRegistered == null ? '/login' : '/home'
     let isLoggedIn = isRegistered == null ? false : true;
 
     return (
       <BrowserRouter basename=''>
         <NavBar cookies={cookies} />
-        <Route path='/signup' render={ props => <SignupPage {...props} cookies={cookies} />}/>
-        {/*<Route path="/">
-          <Redirect exact from='/' to={path} />
-        </Route>*/}
+        { !isRegistered ?
+          <Switch>
+            <Route
+              path='/login'
+              render={ props => 
+                <LoginPage {...props} cookies={cookies} />
+              }
+            />
+            <Route path='/signup' render={ props => <SignupPage {...props} cookies={cookies} />}/>
+            <Route path="/">
+              <Redirect to={'/login'} />
+            </Route>
+          </Switch>
+        :
         <Switch>
+          <Route path='/signup' render={ props => <SignupPage {...props} cookies={cookies} />}/>
           <Route path='/home' render={ props => <HomePage {...props} cookies={cookies} setHotel={this.setHotel} />} />
           <Route
             path='/login'
@@ -37,6 +48,7 @@ class Root extends Component {
           <Route path='/hotelInfo' render={ props => <HotelInfo {...props} cookies={cookies} />} />
           <Route path='/userProfile' render={ props => <UserProfile {...props} cookies={cookies} />} />
         </Switch>
+      }
       </BrowserRouter>
     );
   }

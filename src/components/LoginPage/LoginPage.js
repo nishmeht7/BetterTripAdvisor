@@ -15,6 +15,8 @@ import { withStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import queryString from 'query-string';
 
+import fetchRequest from '../util';
+
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
@@ -84,26 +86,16 @@ class LoginPage extends Component {
   }
 
   loginUser = () => {
-    var headers = {
-      "Content-Type": "application/x-www-form-urlencoded"
-    }
     var query = queryString.stringify({
       username: this.state.username,
       password: this.state.password
     })
 
-    fetch('http://localhost:8090/login', {
-     method: 'POST',
-     headers: headers,
-     body: query
-    })
-    .then(res => {
-      console.log("the response is: ", res)
-      if(res.ok) return res.json();
-    })
-    .then(json => {
+    let url = 'http://localhost:8090/login'
+    let res = fetchRequest(url, "POST", query)
+
+    res.then(json => {
       let { message, success } = json;
-      console.log("message: ", message)
       if(success) {
         let userObj = {
           username: this.state.username,

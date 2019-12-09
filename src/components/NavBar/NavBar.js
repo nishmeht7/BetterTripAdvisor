@@ -8,6 +8,8 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import { withRouter } from 'react-router'
 
+import fetchRequest from '../util';
+
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -21,6 +23,12 @@ const styles = theme => ({
 });
 
 class NavBar extends Component {
+  handleLogout = () => {
+    let url = 'http://localhost:8090/logout';
+    let res = fetchRequest(url, "GET", null)
+    this.props.history.push('/login');
+  }
+
   render() {
     const { classes, cookies, history } = this.props;
     const user = cookies.get('user')
@@ -37,6 +45,7 @@ class NavBar extends Component {
               <Button onClick={() => history.push('/home')} color="inherit">Home </Button>
             </Typography>
             <Button onClick={() => history.push('/userProfile')} color="inherit">{username}</Button>
+            <Button onClick={this.handleLogout} color="inherit">Logout</Button>
           </Toolbar>
         </AppBar>
       </div>

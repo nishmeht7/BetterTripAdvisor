@@ -18,6 +18,7 @@ import ReviewCard from '../ReviewCard';
 import ReviewModal from '../ReviewModal';
 import AttractionsCard from './AttractionsCard';
 import Slider from './Slider';
+import fetchRequest from '../util';
 
 function Copyright() {
   return (
@@ -112,11 +113,9 @@ class HotelInfo extends Component {
   }
 
   fetchHotelInfo() {
-    console.log("hotelID: ", this.state.hotelId);
-    fetch(`http://localhost:8090/reviews?hotelId=${this.state.hotelId}`)
-    .then(res => {
-      if(res.ok) return res.json()
-    })
+    let url = `http://localhost:8090/reviews?hotelId=${this.state.hotelId}`;
+
+    fetchRequest(url, "GET", null)
     .then(json => {
       const { name, addr, reviewsArr } = json;
       let hotelObj = {name, addr};
@@ -142,11 +141,9 @@ class HotelInfo extends Component {
       hotelId: hotelId,
       radius: radius
     })
-    fetch(`http://localhost:8090/attractions?hotelId=${hotelId}&radius=${radius}`, {
-      method: 'GET',
-      headers: headers,
-    })
-    .then(res => { if(res.ok) return res.json() })
+
+    let url = `http://localhost:8090/attractions?hotelId=${hotelId}&radius=${radius}`;
+    fetchRequest(url, "GET", query)
     .then(json => {
       const { results } = json;
       this.setState({ attractionsArr: results }, () => {
@@ -173,20 +170,13 @@ class HotelInfo extends Component {
     var headers = {
       "Content-Type": "application/x-www-form-urlencoded"
     }
-    console.log("userID: ", user.userId)
-    console.log("hotelId: ", this.state.hotelId)
     var query = queryString.stringify({
       userId: user.userId,
       hotelId: this.state.hotelId
     })
-    fetch('http://localhost:8090/hotelInfo', {
-      method: 'POST',
-      headers: headers,
-      body: query
-    })
-    .then(res => {
-      if(res.ok) return res.json()
-    })
+
+    let url = 'http://localhost:8090/hotelInfo'
+    fetchRequest(url, "POST", query)
     .then(json => {
       console.log("saved hotel json: ", json)
     })
@@ -231,14 +221,9 @@ class HotelInfo extends Component {
       delete: true
     })
 
-    fetch('http://localhost:8090/reviews', {
-     method: 'POST',
-     headers: headers,
-     body: query
-    })
-    .then(res => {
-      if(res.ok) return res.json();
-    })
+    let url = 'http://localhost:8090/reviews';
+
+    fetchRequest(url, "POST", query)
     .then (json => {
       const { success } = json;
       if(success) {
@@ -266,23 +251,16 @@ class HotelInfo extends Component {
   handleLikeReview = reviewId => {
     let { cookies } = this.props;
     let user = cookies.get('user');
-    var headers = {
-      "Content-Type": "application/x-www-form-urlencoded"
-    }
+
     let userId = user.userId;
     var query = queryString.stringify({
       userId: userId,
       reviewId: reviewId,
       like: true
     })
-    fetch(`http://localhost:8090/reviews`, {
-      method: 'POST',
-      headers: headers,
-      body: query
-    })
-    .then(res => {
-      if(res.ok) return res.json()
-    })
+
+    let url = 'http://localhost:8090/reviews';
+    fetchRequest(url, "POST", query)
     .then(json => {
       const { success } = json; 
       if(success) {

@@ -68,7 +68,6 @@ const styles = theme => ({
   },
   reviewsWrapper: {
     maxHeight: '100%',
-    // display: 'flex',
     overflow: 'scroll',
     flexDirection: 'column',
     padding: '10px',
